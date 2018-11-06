@@ -1,6 +1,6 @@
 build:
 	dep ensure -v
-	env GOOS=linux go build -ldflags="-s -w" -o bin/slack slack/main.go
+	env GOOS=linux go build -ldflags="-s -w" -o bin/slack ./main.go
 
 .PHONY: clean
 clean:

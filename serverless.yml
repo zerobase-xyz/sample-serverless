@@ -24,7 +24,7 @@ provider:
 
 # you can overwrite defaults here
 #  stage: dev
-#  region: us-east-1
+  region: us-east-1
 
 # you can add statements to the Lambda function's IAM Role here
 #  iamRoleStatements:
@@ -43,8 +43,9 @@ provider:
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  environment:
+    SLACK_TOKEN: hogehoge
+    APEX_GATEWAY_DISABLED: "false"
 
 package:
  exclude:
@@ -54,10 +55,10 @@ package:
 
 functions:
   echo:
-    handler: bin/echo
+    handler: bin/slack
     events:
       - http:
-          path: /
+          path: slack
           method: post
 
 #    The following are a few example events you can configure
