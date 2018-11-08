@@ -40,7 +40,7 @@ provider:
 
 # you can define service wide environment variables here
   environment:
-    SLACK_TOKEN: sUZz0Y8NuTSarRGQ2Zvylzvy
+    SLACK_TOKEN: 
     APEX_GATEWAY_DISABLED: "false"
 
 package:
