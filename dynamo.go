@@ -3,14 +3,10 @@ package main
 import (
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/guregu/dynamo"
 )
 
-// Use struct tags much like the standard JSON library,
-// you can embed anonymous structs too!
-type ecsservice struct {
+type Ecsservice struct {
 	ServiceName string
 	Project     string `dynamo:"Project"`
 	Account     int    `dynamo:"Account"`
@@ -20,11 +16,9 @@ type ecsservice struct {
 	Time        time.Time
 }
 
-type ecsservices []ecsservice
+type Ecsservices []Ecsservice
 
-const hashkey = "Servicename"
-
-func PutData(w *ecsservice, table *dynamo.Table) error {
+func PutData(w *Ecsservice, table dynamo.Table) error {
 	err := table.Put(w).Run()
 	if err != nil {
 		return err
@@ -36,9 +30,9 @@ func PutData(w *ecsservice, table *dynamo.Table) error {
 	return nil
 }
 
-func GetData(w *ecsservice, table *dynamo.Table) (ecsservice, error) {
-	var result ecsservice
-	err := table.Get(hashkey, w.ServiceName).
+func GetData(w string, hashkey string, table dynamo.Table) (Ecsservice, error) {
+	var result Ecsservice
+	err := table.Get(hashkey, w).
 		One(&result)
 	if err != nil {
 		return result, err
@@ -46,8 +40,8 @@ func GetData(w *ecsservice, table *dynamo.Table) (ecsservice, error) {
 	return result, nil
 }
 
-func ScanData(w *ecsservice, table *dynamo.Table) (ecsservices, error) {
-	var results []ecsservice
+func ScanData(table dynamo.Table) (Ecsservices, error) {
+	var results []Ecsservice
 	err := table.Scan().All(&results)
 	if err != nil {
 		return results, err
@@ -55,17 +49,11 @@ func ScanData(w *ecsservice, table *dynamo.Table) (ecsservices, error) {
 	return results, nil
 }
 
-func DeleteData(w *ecsservice, table *dynamo.Table) (ecsservice, error) {
-	var result ecsservice
-	err := table.Delete(hashkey, w.ServiceName).OldValue(&result)
+func DeleteData(w string, hashkey string, table dynamo.Table) (Ecsservice, error) {
+	var result Ecsservice
+	err := table.Delete(hashkey, w).OldValue(&result)
 	if err != nil {
 		return result, err
 	}
 	return result, nil
-}
-
-func main() {
-	db := dynamo.New(session.New(), &aws.Config{Region: aws.String("ap-northeast-1")})
-	table := db.Table("ecs_operation")
-	w := ecsservice{ServiceName: "test", Time: time.Now(), Project: "hello", Account: 21904811, Cluster: "test", Region: "ap-northeasti-1", EcsName: "test"}
 }
