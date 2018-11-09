@@ -1,29 +1,31 @@
 package main
 
 import (
-	"time"
+	"strconv"
+	"strings"
 
 	"github.com/guregu/dynamo"
 )
 
 type Ecsservice struct {
-	ServiceName string
-	Project     string `dynamo:"Project"`
-	Account     int    `dynamo:"Account"`
-	Cluster     string `dynamo:"Cluster"`
-	Region      string `dynamo:"Region"`
-	EcsName     string `dynamo:"EcsName"`
-	Time        time.Time
+	ServiceName string `json:"ServiceName"`
+	Project     string `json:"Project"`
+	Account     int    `json:"Account"`
+	Cluster     string `json:"Cluster"`
+	Region      string `json:"Region"`
+	EcsName     string `json:"EcsName"`
 }
 
 type Ecsservices []Ecsservice
 
-func PutData(w *Ecsservice, table dynamo.Table) error {
+func (ecs *Ecsservice) Describe() string {
+	textS := []string{ecs.ServiceName, ecs.Project, strconv.Itoa(ecs.Account), ecs.Cluster, ecs.Region, ecs.EcsName}
+	text := strings.Join(textS, " ")
+	return text
+}
+
+func PutData(w Ecsservice, table dynamo.Table) error {
 	err := table.Put(w).Run()
-	if err != nil {
-		return err
-	}
-	err = table.Put(w).Run()
 	if err != nil {
 		return err
 	}

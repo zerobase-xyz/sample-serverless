@@ -131,7 +131,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/apex/gateway",
-    "github.com/aws/aws-sdk-go/aws",
     "github.com/aws/aws-sdk-go/aws/session",
     "github.com/guregu/dynamo",
     "github.com/nlopes/slack",
