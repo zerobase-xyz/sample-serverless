@@ -50,12 +50,10 @@ package:
    - ./bin/**
 
 functions:
-  echo:
+  slash:
     handler: bin/slack
     events:
-      - http:
-          path: slash
-          method: post
+      - http: ANY {proxy+}
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -93,11 +91,11 @@ functions:
 
 # you can add CloudFormation resource templates here
 Resources:
-  myDynamoDBTable:
+  DynamoDBTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
-        - AttributeName: "ecs_operation"
+        - AttributeName: "ServiceName"
           AttributeType: S
       KeySchema:
         - AttributeName: "ServiceName"
@@ -105,7 +103,4 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 5
-Outputs:
-  TableName:
-    Value:
-      Ref: myDynamoDBTable
+      TableName: "ecs-opration"
