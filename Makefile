@@ -1,6 +1,6 @@
 build:
 	dep ensure -v
-	env GOOS=linux go build -ldflags="-s -w" -o bin/slash
+	env GOOS=linux go build cmd/slacsops -ldflags="-s -w" -o bin/slash
 
 .PHONY: clean
 clean:
