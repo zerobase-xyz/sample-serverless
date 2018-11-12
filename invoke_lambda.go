@@ -9,11 +9,11 @@ import (
 	"github.com/aws/aws-sdk-go/service/lambda"
 )
 
-func InvokeLambda(param Ecsupdate) error {
+func InvokeLambda(param EcsUpdate) error {
 	sess := session.Must(session.NewSession())
 	s := ecs.New(sess)
 	update := ecs.UpdateServiceInput{}
-	update.Cluster = &param.ecsservice.Cluster
+	update.Cluster = &param.EcsService.Cluster
 
 	lamb := lambda.New(sess)
 	payload, err := json.Marshal(param)

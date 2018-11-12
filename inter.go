@@ -5,15 +5,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
-	"strconv"
 	"strings"
 
 	"github.com/nlopes/slack"
 )
 
 func Inter(w http.ResponseWriter, r *http.Request) {
-	slackToken := os.Getenv("SLACK_TOKEN")
+	dyna := DynaSession{Tablename: tablename, Hashkey: hashkey}
+	dyna.Dynamodb = DynamoSession(region)
 	buf, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -45,13 +44,13 @@ func Inter(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	form := strings.Split(res.OriginalMessage.Text, " ")
-	count, err := strconv.Itoi(form[1])
-	ecs, err := GetData(form[0])
+	e := EcsService{DynaSession: dyna, ServiceName: form[0]}
+	result, err := e.GetData()
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-	payload := Ecsupdate{ecs, count}
+	payload := EcsUpdate{EcsService: e, Count: form[1]}
 
 	err = InvokeLambda(payload)
 	if err != nil {

@@ -1,28 +1,28 @@
 package slacsops
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
-var (
-	hashkey   = "ServiceName"
-	region    = "ap-northeast-1"
-	tablename = "ecs_operation"
-)
-
-func DynamoSess() *dynamodb.DynamoDB {
+func DynamoSession(r string) *dynamodb.DynamoDB {
 	sess := session.Must(session.NewSession())
-	svc := dynamodb.New(sess, aws.NewConfig().WithRegion("region"))
+	svc := dynamodb.New(sess, aws.NewConfig().WithRegion(r))
 	return svc
 }
 
-type Ecsservice struct {
+type DynaSession struct {
+	Dynamodb  *dynamodb.DynamoDB
+	Tablename string
+	Hashkey   string
+}
+
+type EcsService struct {
+	DynaSession DynaSession
 	ServiceName string `json:"ServiceName"`
 	Project     string `json:"Project"`
 	Account     string `json:"Account"`
@@ -31,20 +31,19 @@ type Ecsservice struct {
 	EcsName     string `json:"EcsName"`
 }
 
-type Ecsservices []Ecsservice
+type EcsServices []EcsService
 
-type Ecsupdate struct {
-	ecsservice Ecsservice
-	count      string
+type EcsUpdate struct {
+	EcsService EcsService
+	Count      string
 }
 
-func (e *Ecsservice) Describe() string {
+func (e *EcsService) Describe() string {
 	textS := []string{e.ServiceName, e.Project, e.Account, e.Cluster, e.Region, e.EcsName}
 	return strings.Join(textS, " ")
 }
 
-func (e *Ecsservice) PutData() error {
-	svc := DynamoSess()
+func (e *EcsService) PutData() error {
 	input := &dynamodb.PutItemInput{
 		Item: map[string]*dynamodb.AttributeValue{
 			"ServiceName": {
@@ -66,56 +65,59 @@ func (e *Ecsservice) PutData() error {
 				S: aws.String(e.EcsName),
 			},
 		},
-		TableName: aws.String(tablename),
+		TableName: aws.String(e.DynaSession.Tablename),
 	}
-	result, err := svc.PutItem(input)
+	result, err := e.DynaSession.Dynamodb.PutItem(input)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case dynamodb.ErrCodeConditionalCheckFailedException:
-				fmt.Println(dynamodb.ErrCodeConditionalCheckFailedException, aerr.Error())
-			case dynamodb.ErrCodeProvisionedThroughputExceededException:
-				fmt.Println(dynamodb.ErrCodeProvisionedThroughputExceededException, aerr.Error())
-			case dynamodb.ErrCodeResourceNotFoundException:
-				fmt.Println(dynamodb.ErrCodeResourceNotFoundException, aerr.Error())
-			case dynamodb.ErrCodeItemCollectionSizeLimitExceededException:
-				fmt.Println(dynamodb.ErrCodeItemCollectionSizeLimitExceededException, aerr.Error())
-			case dynamodb.ErrCodeInternalServerError:
-				fmt.Println(dynamodb.ErrCodeInternalServerError, aerr.Error())
-			default:
-				fmt.Println(aerr.Error())
-			}
-		} else {
-			fmt.Println(err.Error())
-		}
+		return nil
 	}
 	return nil
 }
 
-func (e *Ecsservice) GetData(k string) (r *Ecsservice, err error) {
-	svc := DynamoSess()
+func (e *EcsService) GetData() (r *EcsService, err error) {
 	input := &dynamodb.GetItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"ServiceName": {
 				S: aws.String(e.ServiceName),
 			},
 		},
-		TableName: aws.String(tablename),
+		TableName: aws.String(e.DynaSession.Tablename),
 	}
 
-	r, err := svc.GetItem(input)
-	return r, nil
-}
-
-func ScanData() (Ecsservices, error) {
-	var results []Ecsservice
-	return results, table.Scan().All(&results)
-}
-
-func DeleteData(w string) (e Ecsservice, err error) {
-	err = table.Delete(hashkey, w).OldValue(&e)
+	result, err := e.DynaSession.Dynamodb.GetItem(input)
+	err = dynamodbattribute.UnmarshalMap(result.Item, &r)
 	if err != nil {
 		return nil, err
 	}
-	return e, nil
+	return r, nil
+}
+
+func (e *DynaSession) ScanData() (r EcsServices, err error) {
+	input := &dynamodb.ScanInput{
+		TableName: aws.String(e.Tablename),
+	}
+
+	result, err := e.Dynamodb.Scan(input)
+	err = dynamodbattribute.UnmarshalListOfMaps(result.Items, &r)
+	if err != nil {
+		return r, err
+	}
+	return r, nil
+}
+
+func (e *EcsService) DeleteData() error {
+	input := &dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"ServiceName": {
+				S: aws.String(e.ServiceName),
+			},
+		},
+		TableName: aws.String(e.DynaSession.Tablename),
+	}
+
+	_, err := e.DynaSession.Dynamodb.DeleteItem(input)
+	if err != nil {
+		return err
+	}
+	return nil
 }
