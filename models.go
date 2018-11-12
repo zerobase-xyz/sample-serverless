@@ -67,7 +67,7 @@ func (e *EcsService) PutData() error {
 		},
 		TableName: aws.String(e.DynaSession.Tablename),
 	}
-	result, err := e.DynaSession.Dynamodb.PutItem(input)
+	_, err := e.DynaSession.Dynamodb.PutItem(input)
 	if err != nil {
 		return nil
 	}

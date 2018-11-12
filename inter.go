@@ -45,7 +45,7 @@ func Inter(w http.ResponseWriter, r *http.Request) {
 	}
 	form := strings.Split(res.OriginalMessage.Text, " ")
 	e := EcsService{DynaSession: dyna, ServiceName: form[0]}
-	result, err := e.GetData()
+	_, err = e.GetData()
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return

@@ -55,23 +55,17 @@
     "private/protocol/query",
     "private/protocol/query/queryutil",
     "private/protocol/rest",
+    "private/protocol/restjson",
     "private/protocol/xml/xmlutil",
     "service/dynamodb",
     "service/dynamodb/dynamodbattribute",
-    "service/dynamodb/dynamodbiface",
+    "service/ecs",
+    "service/lambda",
     "service/sts",
   ]
   pruneopts = ""
   revision = "8cb75b60636a37baea457bc6d900b49d663e309c"
   version = "v1.15.71"
-
-[[projects]]
-  digest = "1:f619cb9b07aebe5416262cdd8b86082e8d5bdc5264cb3b615ff858df0b645f97"
-  name = "github.com/cenkalti/backoff"
-  packages = ["."]
-  pruneopts = ""
-  revision = "2ea60e5f094469f9e65adb9cd103795b73ae743e"
-  version = "v2.0.0"
 
 [[projects]]
   digest = "1:09aa5dd1332b93c96bde671bafb053249dc813febf7d5ca84e8f382ba255d67d"
@@ -80,17 +74,6 @@
   pruneopts = ""
   revision = "66b9c49e59c6c48f0ffce28c2d8b8a5678502c6d"
   version = "v1.4.0"
-
-[[projects]]
-  digest = "1:19435fddce93bfc9e6cdaf98fdceabf306f28eee0699334c35278a12850bf863"
-  name = "github.com/guregu/dynamo"
-  packages = [
-    ".",
-    "internal/exprs",
-  ]
-  pruneopts = ""
-  revision = "e38c48c566f44b8dbaa18ec7c429e43194f7233a"
-  version = "v1.0.0"
 
 [[projects]]
   digest = "1:6f49eae0c1e5dab1dafafee34b207aeb7a42303105960944828c2079b92fc88e"
@@ -118,21 +101,17 @@
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
-[[projects]]
-  branch = "master"
-  digest = "1:3b86e1cf4059ba6c2cf189f60655a16a8e32d221ed23c4137ac6b2adeaeccc52"
-  name = "golang.org/x/net"
-  packages = ["context"]
-  pruneopts = ""
-  revision = "03003ca0c849e57b6ea29a4bab8d3cb6e4d568fe"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/apex/gateway",
+    "github.com/aws/aws-sdk-go/aws",
     "github.com/aws/aws-sdk-go/aws/session",
-    "github.com/guregu/dynamo",
+    "github.com/aws/aws-sdk-go/service/dynamodb",
+    "github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute",
+    "github.com/aws/aws-sdk-go/service/ecs",
+    "github.com/aws/aws-sdk-go/service/lambda",
     "github.com/nlopes/slack",
   ]
   solver-name = "gps-cdcl"

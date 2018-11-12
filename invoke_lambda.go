@@ -11,7 +11,7 @@ import (
 
 func InvokeLambda(param EcsUpdate) error {
 	sess := session.Must(session.NewSession())
-	s := ecs.New(sess)
+	_ = ecs.New(sess)
 	update := ecs.UpdateServiceInput{}
 	update.Cluster = &param.EcsService.Cluster
 

@@ -3,19 +3,9 @@ package slacsops
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/nlopes/slack"
-)
-
-var (
-	slackToken  = os.Getenv("SLACK_TOKEN")
-	botToken    = os.Getenv("SLACK_BOT_TOKEN")
-	postChannel = os.Getenv("POST_CHANNEL")
-	hashkey     = "ServiceName"
-	region      = "ap-northeast-1"
-	tablename   = "ecs_operation"
 )
 
 func Slash(w http.ResponseWriter, r *http.Request) {

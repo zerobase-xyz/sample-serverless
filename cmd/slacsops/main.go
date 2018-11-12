@@ -13,7 +13,7 @@ import (
 func main() {
 	ApexGatewayDisabled := os.Getenv("APEX_GATEWAY_DISABLED")
 	http.HandleFunc("/slash", slacsops.Slash)
-	http.HandleFunc("/interr", slacsops.Interr)
+	http.HandleFunc("/interr", slacsops.Inter)
 
 	if ApexGatewayDisabled == "true" {
 		log.Fatal(http.ListenAndServe(":3000", nil))
